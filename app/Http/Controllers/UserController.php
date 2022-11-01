@@ -23,7 +23,7 @@ class UserController extends Controller
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()
-                ->json(['message' => 'Olá '.$user->name.', Bem Vindo a home','access_token' => $token, 'token_type' => 'Bearer', ]);
+                ->json(['username' => $user->name, 'permission' => $user->permission, 'status' => $user->status, 'email' => $user->email, 'access_token' => $token, 'token_type' => 'Bearer', ]);
         }
 
     }
@@ -50,6 +50,15 @@ class UserController extends Controller
 
             return response()->json(['success' => 'Usuario cadastrado com sucesso!']);
         }
+    }
+
+    public function logout(){
+
+        auth()->user()->tokens()->delete();
+
+        return [
+            'success' => 'Você deslogou, Token deletado com sucesso!'
+        ];
     }
 
     public function show_user(){

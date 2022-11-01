@@ -16,14 +16,16 @@ use App\Http\Controllers\TasksController;
 |
 */
 
-Route::get('/register', [UserController::class, 'register'])->name('register');
+Route::post('/register', [UserController::class, 'register'])->name('register');
 
 Route::post('/login', [UserController::class, 'login'])->name('login');
 
 //Rotas Protegidas
-Route::group(['middleware' => ['auth:sanctum']], function () {
+Route::group(['middleware' => ['auth:sanctum']], function (Request $request) {
 
     //Users
+
+    Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
     Route::post('/show_user', [UserController::class, 'show_user'])->name('show_user');
 
