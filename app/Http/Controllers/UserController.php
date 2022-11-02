@@ -56,9 +56,24 @@ class UserController extends Controller
 
         auth()->user()->tokens()->delete();
 
-        return [
-            'success' => 'Você deslogou, Token deletado com sucesso!'
-        ];
+        return response()->json(['success' => 'Token deletado com sucesso!']);
+    }
+
+    public function dashboard(){
+
+        $id = auth()->user()->id;
+        $permission = auth()->user()->permission;
+
+        $tasks = DB::select("select * from tasks where id = '$id'");
+
+        if($permission == "admin"){
+
+            $users = DB::select("select name from users");
+
+            return response()->json(['users' => $users, 'tasks' => $tasks]);
+        }else{
+            return response()->json(['tasks' => $tasks]);
+        }
     }
 
     public function show_user(){
@@ -68,7 +83,7 @@ class UserController extends Controller
 
     public function edit_user(){
 
-        echo("Editando usuario");
+        return response()->json(['success' => 'Acesso ao edit user com sucesso!']);
     }
 
     public function edit_permission(Request $request){
@@ -78,7 +93,7 @@ class UserController extends Controller
 
     public function show_users(){
 
-        echo("Todos usuarios");
+        return response()->json(['success' => 'Acesso aos usuarios com sucesso!']);
     }
 
     public function search_user(Request $request){

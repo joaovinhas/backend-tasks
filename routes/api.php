@@ -21,13 +21,15 @@ Route::post('/register', [UserController::class, 'register'])->name('register');
 Route::post('/login', [UserController::class, 'login'])->name('login');
 
 //Rotas Protegidas
-Route::group(['middleware' => ['auth:sanctum']], function (Request $request) {
+Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //Users
 
-    Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+    Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 
-    Route::post('/show_user', [UserController::class, 'show_user'])->name('show_user');
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/show_user', [UserController::class, 'show_user'])->name('show_user');
 
     Route::post('/edit_user', [UserController::class, 'edit_user'])->name('edit_user');
 
@@ -41,7 +43,7 @@ Route::group(['middleware' => ['auth:sanctum']], function (Request $request) {
 
     //Tasks
 
-    Route::post('/create_tasks', [TasksController::class, 'create_tasks'])->name('create_tasks');
+    Route::post('/create_task', [TasksController::class, 'create_task'])->name('create_task');
 
     Route::post('/edit_task', [TasksController::class, 'edit_task'])->name('edit_tasks');
 
