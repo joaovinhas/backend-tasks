@@ -42,9 +42,11 @@ class TasksController extends Controller
 
     public function all_tasks(){
 
-        $root_tasks = DB::select("select * from tasks where id_parent = 0");
+        $id = auth()->user()->id;
 
-        $child_tasks = DB::select("select * from tasks where id_parent != 0");
+        $root_tasks = DB::select("select * from tasks where id_parent = 0 AND id_user = '$id'");
+
+        $child_tasks = DB::select("select * from tasks where id_parent != 0 AND id_user = '$id'");
 
         return response()->json(['root_tasks' => $root_tasks, 'child_tasks' => $child_tasks]);
 

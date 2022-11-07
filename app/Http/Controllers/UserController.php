@@ -63,22 +63,29 @@ class UserController extends Controller
 
         $id = auth()->user()->id;
         $permission = auth()->user()->permission;
+        $status = auth()->user()->status;
 
-        $tasks = DB::select("select * from tasks where id = '$id'");
+        if($status != "block"){
 
-        if($permission == "admin"){
+            $tasks = DB::select("select task from tasks where id_user = '$id'");
 
-            $users = DB::select("select name from users");
+            if($permission == "admin"){
 
-            return response()->json(['users' => $users, 'tasks' => $tasks]);
+                $users = DB::select("select name from users");
+
+                return response()->json(['users' => $users, 'tasks' => $tasks]);
+            }else{
+                return response()->json(['tasks' => $tasks]);
+            }
+
         }else{
-            return response()->json(['tasks' => $tasks]);
+            return response()->json(['error' => 'Usuario bloqueado!']);
         }
     }
 
     public function show_user(){
 
-        echo("Dados usuario");
+        echo("show usuario");
     }
 
     public function edit_user(){
@@ -88,12 +95,86 @@ class UserController extends Controller
 
     public function edit_permission(Request $request){
 
-        echo("Editando usuario");
+        $id = auth()->user()->id;
+        $permission = auth()->user()->permission;
+        $status = auth()->user()->status;
+
+        if($permission == "admin" AND $status != "block"){
+
+
+            $validator = Validator::make($request->all(),[
+                'id_user' => 'required|int',
+                'permission' => 'required|string',
+                'status' => 'required|string'
+            ]);
+
+            if($validator->fails()){
+                
+                return response()->json($validator->errors()); 
+
+            }else{
+
+                switch ($request->permission) {
+                    case 'admin':
+                        $permission_user = 'admin';
+                        break;
+                    case 'client':
+                        $permission_user = 'client';
+                        break;
+                    default:
+                        return response()->json(['error' => 'Valor Invalido!']);
+                        die();
+                        break;
+                }
+
+                switch ($request->status) {
+                    case 'free':
+                        $status_user = 'free';
+                        break;
+                    case 'unlimited':
+                        $status_user = 'unlimited';
+                        break;
+                    case 'paid':
+                        $status_user = 'paid';
+                        break;
+                    case 'block':
+                        $status_user = 'block';
+                        break;
+                    default:
+                        return response()->json(['error' => 'Valor Invalido!']);
+                        die();
+                        break;
+                }
+
+                $validatedData = (['status' => $status_user , 'permission' => $permission_user ]);
+
+                $id_user = $request->id_user;
+
+                User::whereId($id_user)->update($validatedData);
+
+                return response()->json(['success' => 'Permissoes alteradas com sucesso!']);
+
+            }
+        }
+
     }
 
     public function show_users(){
 
-        return response()->json(['success' => 'Acesso aos usuarios com sucesso!']);
+        $id = auth()->user()->id;
+        $permission = auth()->user()->permission;
+        $status = auth()->user()->status;
+
+        if($permission == "admin" AND $status != "block"){
+
+            $users = DB::select("select id, name, email, permission, status from users");
+
+            return response()->json(['success' => $users]);
+
+        }else{
+            return response()->json(['error' => 'Usuario sem permissão']);
+        }
+
     }
 
     public function search_user(Request $request){
