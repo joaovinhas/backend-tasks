@@ -29,6 +29,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
+    Route::get('/check_user', [UserController::class, 'check_user'])->name('check_user');
+
     Route::get('/show_user', [UserController::class, 'show_user'])->name('show_user');
 
     Route::post('/edit_user', [UserController::class, 'edit_user'])->name('edit_user');

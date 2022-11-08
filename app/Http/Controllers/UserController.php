@@ -18,12 +18,20 @@ class UserController extends Controller
                 ->json(['error' => 'Unauthorized'], 401);
         }else{
 
-            $user = User::where('email', $request['email'])->firstOrFail();
+            $status = auth()->user()->status;
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+            if($status != "block"){
 
-            return response()
-                ->json(['username' => $user->name, 'permission' => $user->permission, 'status' => $user->status, 'email' => $user->email, 'access_token' => $token, 'token_type' => 'Bearer', ]);
+                $user = User::where('email', $request['email'])->firstOrFail();
+
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return response()
+                ->json(['username' => $user->name, 'access_token' => $token, 'token_type' => 'Bearer', ]);
+            }else{
+                return response()->json(['success' => 'Cliente esta bloqueado!']);
+            }
+
         }
 
     }
@@ -50,6 +58,17 @@ class UserController extends Controller
 
             return response()->json(['success' => 'Usuario cadastrado com sucesso!']);
         }
+    }
+
+    public function check_user(){
+
+        $permission = auth()->user()->permission;
+        $status = auth()->user()->status;
+
+        $user = (['status' => $status, 'permission' => $permission]);
+
+        return response()->json(['user' => $user]);
+
     }
 
     public function logout(){
