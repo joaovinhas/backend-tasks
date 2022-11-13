@@ -104,12 +104,79 @@ class UserController extends Controller
 
     public function show_user(){
 
-        echo("show usuario");
+        $id = auth()->user()->id;
+        $permission = auth()->user()->permission;
+        $status = auth()->user()->status;
+
+        if($status != "block"){
+
+            $user = ([ 'username' => auth()->user()->name , 'email' => auth()->user()->email]);
+
+            return response()->json(['user' => $user]);
+
+        }else{
+            return response()->json(['error' => 'Usuario bloqueado!']);
+        }
     }
 
-    public function edit_user(){
+    public function edit_user(Request $request){
 
-        return response()->json(['success' => 'Acesso ao edit user com sucesso!']);
+        $id = auth()->user()->id;
+        $status = auth()->user()->status;
+
+        if($status != "block"){
+
+            if(auth()->user()->name != $request['name'] AND auth()->user()->email != $request['email']){
+
+                $validator = Validator::make($request->all(),[
+                    'name' => 'required|string|max:255',
+                    'email' => 'required|string|email|max:255|unique:users',
+                ]);
+
+                if($validator->fails()){
+                    return response()->json($validator->errors());       
+                }else{
+                    $validatedData = ([ 'name' => $request['name'], 'email' => $request['email'] ]);
+                }
+                    
+            
+            }else if(auth()->user()->email != $request['email']){
+
+                $validator = Validator::make($request->all(),[
+                    'email' => 'required|string|email|max:255|unique:users',
+                ]);
+
+                if($validator->fails()){
+                    return response()->json($validator->errors());       
+                }else{
+                     $validatedData = ([ 'email' => $request['email'] ]);
+                }
+            
+
+            }else{
+
+                $validator = Validator::make($request->all(),[
+                    'name' => 'required|string|max:255',
+                ]);
+
+                if($validator->fails()){
+                    return response()->json($validator->errors());       
+                }else{
+                    $validatedData = ([ 'name' => $request['name'] ]);
+                }
+
+            }
+
+            User::whereId($id)->update($validatedData);
+
+            return response()->json(['success' => 'Usuario editado com sucesso!']);
+
+
+
+        }else{
+            return response()->json(['error' => 'Usuario bloqueado!']);
+        }
+
     }
 
     public function edit_permission(Request $request){
