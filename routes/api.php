@@ -37,6 +37,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('/edit_permission', [UserController::class, 'edit_permission'])->name('edit_permission');
 
+    Route::post('/edit_password', [UserController::class, 'edit_password'])->name('edit_password');
+
     Route::get('/show_users', [UserController::class, 'show_users'])->name('show_users');
 
     Route::post('/search_user', [UserController::class, 'search_user'])->name('search_user');

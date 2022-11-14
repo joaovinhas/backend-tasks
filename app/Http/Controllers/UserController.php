@@ -187,7 +187,6 @@ class UserController extends Controller
 
         if($permission == "admin" AND $status != "block"){
 
-
             $validator = Validator::make($request->all(),[
                 'id_user' => 'required|int',
                 'permission' => 'required|string',
@@ -245,6 +244,30 @@ class UserController extends Controller
 
     }
 
+    public function edit_password(Request $request){
+
+        $id = auth()->user()->id;
+        $status = auth()->user()->status;
+
+        if($status != "block"){
+
+            $validator = Validator::make($request->all(),[
+                'new_password' => 'required|string|min:8'
+            ]);
+
+            if($validator->fails()){
+                return response()->json($validator->errors());       
+            }else{
+
+                $validatedData = ([ 'password' => Hash::make($request->new_password) ]);
+
+                User::whereId($id)->update($validatedData);
+
+                return response()->json(['success' => 'Senha alterada com sucesso!']);
+            }
+        }
+    }
+
     public function show_users(){
 
         $id = auth()->user()->id;
@@ -253,7 +276,7 @@ class UserController extends Controller
 
         if($permission == "admin" AND $status != "block"){
 
-            $users = DB::select("select id, name, email, permission, status from users");
+            $users = DB::select("select name, email, permission, status from users where id != '$id'");
 
             return response()->json(['success' => $users]);
 
@@ -265,7 +288,49 @@ class UserController extends Controller
 
     public function search_user(Request $request){
 
-        echo("Buscando usuarios");
+        $id = auth()->user()->id;
+        $permission = auth()->user()->permission;
+        $status = auth()->user()->status;
+
+        if($permission == "admin" AND $status != "block"){
+
+            $validator = Validator::make($request->all(),[
+                'search' => 'required|string',
+                'type' => 'required|string',
+            ]);
+
+            if($validator->fails()){
+                
+                return response()->json($validator->errors()); 
+
+            }else{
+
+                $search = $request->search;
+
+                switch ($request->type) {
+                    case 'name':
+                        $users = DB::select("select name, email, status, permission from users where name like '%$search%'");
+                        break;
+                    case 'email':
+                        $users = DB::select("select name, email, status, permission from users where email like '%$search%'");
+                        break;
+                    case 'status':
+                        $users = DB::select("select name, email, status, permission from users where status like '%$search%'");
+                        break;
+                    case 'permission':
+                        $users = DB::select("select name, email, status, permission from users where permission like '%$search%'");
+                        break;
+                    default:
+                        return response()->json(['error' => 'Valor Invalido!']);
+                        die();
+                        break;
+                }
+
+                return response()->json(['users' => $users]);
+
+            }
+        
+        }
     }
 
     public function del_user(Request $request){
