@@ -104,7 +104,47 @@ class TasksController extends Controller
 
     public function search_task(Request $request){
 
-        echo("Buscando tasks");
+        $id = auth()->user()->id;
+        $status = auth()->user()->status;
+
+        if($status != "block"){
+
+            $validator = Validator::make($request->all(),[
+                'search' => 'required|string',
+                'type' => 'required|string',
+            ]);
+
+            if($validator->fails()){
+                
+                return response()->json($validator->errors()); 
+
+            }else{
+
+                $search = $request->search;
+
+                switch ($request->type) {
+                    case 'task':
+                        $tasks = DB::select("select * from tasks where task like '%$search%' AND id_user = '$id'");
+                        break;
+                    case 'concluded':
+                        if($search == 'concluded'){
+                            $search = 1;
+                        }else{
+                            $search = 0;
+                        }
+                        $tasks = DB::select("select * from tasks where concluded like '%$search%' AND id_user = '$id'");
+                        break;
+                    default:
+                        return response()->json(['error' => 'Valor Invalido!']);
+                        die();
+                        break;
+                }
+
+                return response()->json(['root_tasks' => $tasks]);
+
+            }
+
+        }
 
     }
 
