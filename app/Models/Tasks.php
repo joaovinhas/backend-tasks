@@ -14,6 +14,5 @@ class Tasks extends Model
         'id_parent',
         'id_user',
         'concluded',
-        'timer',
     ];
 }

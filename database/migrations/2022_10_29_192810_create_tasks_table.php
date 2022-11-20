@@ -20,7 +20,6 @@ return new class extends Migration
             $table->foreign('id_user')->references('id')->on('users')->onDelete('cascade');
             $table->integer('id_parent');
             $table->boolean('concluded');
-            $table->date('timer');
             $table->timestamps();
         });
     }

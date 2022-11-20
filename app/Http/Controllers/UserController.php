@@ -64,8 +64,20 @@ class UserController extends Controller
 
         $permission = auth()->user()->permission;
         $status = auth()->user()->status;
+        $today = new \DateTime(date('Y-m-d'));
+        $days = $today->diff(auth()->user()->created_at);
 
-        $user = (['status' => $status, 'permission' => $permission]);
+        if($status == 'free' AND $days->d > 7 AND $permission != 'admin'){
+
+            $validatedData = (['status' => 'block' ]);
+
+            User::whereId(auth()->user()->id)->update($validatedData);
+
+            $status = 'block';
+
+        }
+
+        $user = (['status' => $status, 'permission' => $permission, 'date' => $days->d]);
 
         return response()->json(['user' => $user]);
 
@@ -276,7 +288,7 @@ class UserController extends Controller
 
         if($permission == "admin" AND $status != "block"){
 
-            $users = DB::select("select name, email, permission, status from users where id != '$id'");
+            $users = DB::select("select id, name, email, permission, status from users where id != '$id'");
 
             return response()->json(['success' => $users]);
 

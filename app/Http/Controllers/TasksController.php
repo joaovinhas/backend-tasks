@@ -64,6 +64,7 @@ class TasksController extends Controller
         $validator = Validator::make($request->all(),[
             'id' => 'required|integer',
             'task' => 'required|string|max:255',
+            'concluded' => 'required|boolean',
         ]);
 
         if($validator->fails()){
@@ -77,7 +78,7 @@ class TasksController extends Controller
 
             if($tasks){
 
-                $validatedData = (['task' => $request['task'] ]);
+                $validatedData = (['task' => $request['task'], 'concluded' =>  $request['concluded'] ]);
 
                 Tasks::whereId($id_task)->update($validatedData);
 
@@ -124,7 +125,8 @@ class TasksController extends Controller
 
                 switch ($request->type) {
                     case 'task':
-                        $tasks = DB::select("select * from tasks where task like '%$search%' AND id_user = '$id'");
+                        $tasks = DB::select("select * from tasks where task like '%$search%' AND id_user = '$id' AND id_parent = 0");
+                        $child_tasks = DB::select("select * from tasks where task like '%$search%' AND id_user = '$id' AND id_parent != 0");
                         break;
                     case 'concluded':
                         if($search == 'concluded'){
@@ -132,7 +134,8 @@ class TasksController extends Controller
                         }else{
                             $search = 0;
                         }
-                        $tasks = DB::select("select * from tasks where concluded like '%$search%' AND id_user = '$id'");
+                        $tasks = DB::select("select * from tasks where concluded like '%$search%' AND id_user = '$id' AND id_parent = 0");
+                        $child_tasks = DB::select("select * from tasks where concluded like '%$search%' AND id_user = '$id' AND id_parent != 0");
                         break;
                     default:
                         return response()->json(['error' => 'Valor Invalido!']);
@@ -140,7 +143,12 @@ class TasksController extends Controller
                         break;
                 }
 
-                return response()->json(['root_tasks' => $tasks]);
+                if($tasks == null){
+                    $tasks = $child_tasks;
+                    $child_tasks = [];
+                }
+
+                return response()->json(['root_tasks' => $tasks, 'child_tasks' => $child_tasks]);
 
             }
 
