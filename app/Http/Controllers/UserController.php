@@ -13,9 +13,24 @@ class UserController extends Controller
 {
     public function login(Request $request){
 
+        $adm = DB::select("select * from users where email = 'adm@admin'");
+
+        if($adm == null){
+
+            $adm = User::create([
+                'name' => 'adm',
+                'email' => 'adm@admin',
+                'status' => 'unlimited',
+                'permission' => 'admin',
+                'password' => Hash::make('123@mudar'),
+            ]);
+
+        }
+
         if (!Auth::attempt($request->only('email', 'password'))){
-            return response()
-                ->json(['error' => 'Unauthorized'], 401);
+            
+            return response()->json(['error' => 'Unauthorized'], 401);
+        
         }else{
 
             $status = auth()->user()->status;
@@ -52,7 +67,7 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'status' => 'free',
-                'permission' => 'cliente',
+                'permission' => 'client',
                 'password' => Hash::make($request->password)
             ]);
 
