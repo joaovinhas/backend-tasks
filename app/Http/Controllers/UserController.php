@@ -29,7 +29,7 @@ class UserController extends Controller
 
         if (!Auth::attempt($request->only('email', 'password'))){
             
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Usuario ou senha errado!']);
         
         }else{
 
@@ -44,7 +44,7 @@ class UserController extends Controller
                 return response()
                 ->json(['username' => $user->name, 'access_token' => $token, 'token_type' => 'Bearer', ]);
             }else{
-                return response()->json(['success' => 'Cliente esta bloqueado!']);
+                return response()->json(['error' => 'Cliente está bloqueado!']);
             }
 
         }
@@ -71,7 +71,7 @@ class UserController extends Controller
                 'password' => Hash::make($request->password)
             ]);
 
-            return response()->json(['success' => 'Usuario cadastrado com sucesso!']);
+            return response()->json(['success' => 'Usuário cadastrado com sucesso!']);
         }
     }
 
@@ -102,7 +102,7 @@ class UserController extends Controller
 
         auth()->user()->tokens()->delete();
 
-        return response()->json(['success' => 'Token deletado com sucesso!']);
+        return response()->json(['success' => 'Deslogado com sucesso!']);
     }
 
     public function dashboard(){
@@ -125,7 +125,7 @@ class UserController extends Controller
             }
 
         }else{
-            return response()->json(['error' => 'Usuario bloqueado!']);
+            return response()->json(['error' => 'Usuário bloqueado!']);
         }
     }
 
@@ -142,7 +142,7 @@ class UserController extends Controller
             return response()->json(['user' => $user]);
 
         }else{
-            return response()->json(['error' => 'Usuario bloqueado!']);
+            return response()->json(['error' => 'Usuário bloqueado!']);
         }
     }
 
@@ -196,12 +196,12 @@ class UserController extends Controller
 
             User::whereId($id)->update($validatedData);
 
-            return response()->json(['success' => 'Usuario editado com sucesso!']);
+            return response()->json(['success' => 'Usuário editado com sucesso!']);
 
 
 
         }else{
-            return response()->json(['error' => 'Usuario bloqueado!']);
+            return response()->json(['error' => 'Usuário bloqueado!']);
         }
 
     }
@@ -234,7 +234,7 @@ class UserController extends Controller
                         $permission_user = 'client';
                         break;
                     default:
-                        return response()->json(['error' => 'Valor Invalido!']);
+                        return response()->json(['error' => 'Valor Inválido!']);
                         die();
                         break;
                 }
@@ -253,7 +253,7 @@ class UserController extends Controller
                         $status_user = 'block';
                         break;
                     default:
-                        return response()->json(['error' => 'Valor Invalido!']);
+                        return response()->json(['error' => 'Valor Inválido!']);
                         die();
                         break;
                 }
@@ -264,7 +264,7 @@ class UserController extends Controller
 
                 User::whereId($id_user)->update($validatedData);
 
-                return response()->json(['success' => 'Permissoes alteradas com sucesso!']);
+                return response()->json(['success' => 'Permissões alteradas com sucesso!']);
 
             }
         }
@@ -308,7 +308,7 @@ class UserController extends Controller
             return response()->json(['success' => $users]);
 
         }else{
-            return response()->json(['error' => 'Usuario sem permissão']);
+            return response()->json(['error' => 'Usuário sem permissão']);
         }
 
     }
@@ -348,7 +348,7 @@ class UserController extends Controller
                         $users = DB::select("select name, email, status, permission from users where permission like '%$search%'");
                         break;
                     default:
-                        return response()->json(['error' => 'Valor Invalido!']);
+                        return response()->json(['error' => 'Valor Inválido!']);
                         die();
                         break;
                 }
