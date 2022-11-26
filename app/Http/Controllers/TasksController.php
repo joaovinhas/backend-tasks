@@ -14,7 +14,7 @@ class TasksController extends Controller
 
         $validator = Validator::make($request->all(),[
             'new_task' => 'required|string|max:255',
-            'id_parent' => 'required|integer',
+            'task_parent' => 'string|max:255',
         ]);
 
         if($validator->fails()){
@@ -23,32 +23,30 @@ class TasksController extends Controller
 
             $id_user = auth()->user()->id;
 
-            if($request['id_parent'] == 0){
+            if($request['task_parent'] == 'null' ){
 
                 $task = Tasks::create([
                     'task' => $request['new_task'],
                     'id_parent' => 0,
                     'id_user' => $id_user,
-                    'concluded' => 0,
-                    'timer' => null,
+                    'concluded' => false,
                 ]);
 
                 return response()->json(['success' => 'Task cadastrada com sucesso!']);
 
             }else{
 
-                $id_parent = $request['id_parent'];
+                $task_parent = $request['task_parent'];
+                $id_parent = DB::select("select id from tasks where id_user = '$id_user' and task = '$task_parent' ");
+                $id_parent = $id_parent[0]->id;
 
-                $tasks = DB::select("select id from tasks where id_user = '$id_user' and id = '$id_parent'");
-
-                if($tasks){
+                if($id_parent){
 
                     $task = Tasks::create([
                         'task' => $request['new_task'],
                         'id_parent' => $id_parent,
                         'id_user' => $id_user,
-                        'concluded' => 0,
-                        'timer' => null,
+                        'concluded' => false,
                     ]);
 
                     return response()->json(['success' => 'Task cadastrada com sucesso!']);
