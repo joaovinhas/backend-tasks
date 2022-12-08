@@ -336,16 +336,16 @@ class UserController extends Controller
 
                 switch ($request->type) {
                     case 'name':
-                        $users = DB::select("select name, email, status, permission from users where name like '%$search%'");
+                        $users = DB::select("select name, email, status, permission from users where id != '$id' AND name like '%$search%'");
                         break;
                     case 'email':
-                        $users = DB::select("select name, email, status, permission from users where email like '%$search%'");
+                        $users = DB::select("select name, email, status, permission from users where id != '$id' AND email like '%$search%'");
                         break;
                     case 'status':
-                        $users = DB::select("select name, email, status, permission from users where status like '%$search%'");
+                        $users = DB::select("select name, email, status, permission from users where id != '$id' AND status like '%$search%'");
                         break;
                     case 'permission':
-                        $users = DB::select("select name, email, status, permission from users where permission like '%$search%'");
+                        $users = DB::select("select name, email, status, permission from users where id != '$id' AND permission like '%$search%'");
                         break;
                     default:
                         return response()->json(['error' => 'Valor Inválido!']);
