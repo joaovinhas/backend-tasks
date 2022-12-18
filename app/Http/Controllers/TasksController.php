@@ -38,9 +38,10 @@ class TasksController extends Controller
 
                 $task_parent = $request['task_parent'];
                 $id_parent = DB::select("select id from tasks where id_user = '$id_user' and task = '$task_parent' ");
-                $id_parent = $id_parent[0]->id;
 
                 if($id_parent){
+                    
+                    $id_parent = $id_parent[0]->id;
 
                     $task = Tasks::create([
                         'task' => $request['new_task'],
